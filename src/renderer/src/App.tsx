@@ -1,35 +1,20 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
+import Home from './pages/Home'
+import Description from './pages/Description'
 
 function App(): JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
+  //const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
-  )
+    <Router>
+      <nav>
+        <Link to="/">ホーム</Link> | <Link to="/next">次のページ</Link>
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/description" element={<Description />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App
