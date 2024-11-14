@@ -3,16 +3,44 @@ import actionBlockImg from '../assets/action_block.png';
 import blockExampleImg from '../assets/basic_code.png';
 import actionGif from '../assets/p1_basic_action.gif';
 
+function InitlailDescriptionComponent(): JSX.Element {
+  return (
+    <>
+      <h1 className="text-xl leading-relaxed text-white">このゲームはプログラミングでたたかうシューティングゲームです。
+      <br/>キャラクターのうごきをプログラミングして、あいてをたおしましょう。<br/ >水色のアクションブロックをタッチするとプログラムをつくれます。</h1>
+    </>
+  );
+}
+
+function SecondDescriptionComponent(): JSX.Element {
+  return (
+    <>
+      <span className="bg-purple-700 rounded-lg font-bold p-1">もし◇なら</span>と<span className="bg-yellow-500 rounded-lg font-bold p-1">◇ブロック</span>をあわせると、とくべつなうごきができます。<br/>たとえば、<span className="bg-purple-700 rounded-lg font-bold p-1">もし◇なら</span>のつぎに<span className="bg-yellow-500 rounded-lg font-bold p-1">おなじたかさ</span> をタッチすると、あいてとおなじたかさのときだけこうげきできます。<br/>とくべつなうごきのおわりには、<span className="bg-purple-700 rounded-lg font-bold p-1">もしおわり</span>をタッチしましょう。<br/>プログラムができたら<span className="bg-green-700 rounded-lg font-bold p-1">かんせい</span>をタッチ！<br/>2人のプログラムがそろうとバトルかいし！
+    </>
+  );
+}
+
+function FirstVisualDescriptionComponent(): JSX.Element {
+  return (
+    <>
+      <ul className="m-2"><li><span className="bg-blue-400 rounded-lg font-bold p-1 my-2">こうげき</span>：あいてをこうげき</li><li><span className="bg-blue-400 rounded-lg font-bold p-1 my-2">ためる</span>: こうげき力をあげる</li><li><span className="bg-blue-400 rounded-lg font-bold p-1 my-2">うえ/したにうごく</span>：うえやしたにうごく</li></ul>
+    </>
+  );
+}
+
 function InitlailDescription(): JSX.Element {
   return (
   <>
     <h1 className="font-bold text-center text-2xl bg-gray-400 py-1">あそびかた</h1>
-    <div id="desc" className="text-xl py-2 px-4 leading-relaxed text-white">
-    このゲームはプログラミングでたたかうシューティングゲームです。<br/>キャラクターのうごきをプログラミングして、あいてをたおしましょう。<br/>水色のアクションブロックをタッチするとプログラムをつくれます。<ul className="m-2"><li><span className="bg-blue-400 rounded-lg font-bold p-1 my-2">こうげき</span>：あいてをこうげき</li><li><span className="bg-blue-400 rounded-lg font-bold p-1 my-2">ためる</span>: こうげき力をあげる</li><li><span className="bg-blue-400 rounded-lg font-bold p-1 my-2">うえ/したにうごく</span>：うえやしたにうごく</li></ul>
+    <div className="text-xl py-2 px-4 leading-relaxed text-white">
+      {/* <InitlailDescriptionComponent /> */ }
+      <SecondDescriptionComponent />
+      <FirstVisualDescriptionComponent />
     </div>
   </>
   );
 }
+
 
 function GameProcessDescription(): JSX.Element {
   return (
