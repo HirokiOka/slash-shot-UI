@@ -1,4 +1,7 @@
 // pages/Descriptio.tsx
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import actionBlockImg from '../assets/action_block.png';
 import blockExampleImg from '../assets/basic_code.png';
 import actionGif from '../assets/p1_basic_action.gif';
@@ -7,7 +10,6 @@ import conditionBlockImg from '../assets/condition_block.png';
 import conditionCodeImg from '../assets/condition_code.png';
 import conditionGif from '../assets/condition_movie.gif';
 
-import { useState } from 'react';
 
 function InitlailDescriptionComponent(): JSX.Element {
   return (
@@ -177,12 +179,17 @@ function PageTwo(): JSX.Element {
 function Description(): JSX.Element {
   const buttonClass = "text-lg bg-gray-400 hover:bg-gray-700 text-black py-2 px-8 rounded font-bold";
   const [page, setPage] = useState(0);
-  const nextPage = () => {
-    setPage(page + 1);
+  const handleNextClick = () => {
+    if (page === 1) {
+      navigate('/interface');
+    } else {
+      setPage(page + 1);
+      }
   };
   const prevPage = () => {
     setPage(page - 1);
   };
+  const navigate = useNavigate();
   return (
     <div className="flex justify-center bg-red-700 h-screen">
       <div className="w-11/12 rounded-lg border bg-gray-700">
@@ -203,7 +210,7 @@ function Description(): JSX.Element {
           <div className="text-center py-2 m-auto">
             <button id="nextBtn"
             className={buttonClass}
-            onClick={nextPage}>
+            onClick={handleNextClick}>
               { page === 1 ? 'はじめる' : 'つぎへ' }
             </button>
           </div>

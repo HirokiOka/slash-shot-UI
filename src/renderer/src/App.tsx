@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import Description from './pages/Description'
+import Interface from './pages/Interface'
 
 function App(): JSX.Element {
   //const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
@@ -12,6 +13,7 @@ function App(): JSX.Element {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/description" element={<Description />} />
+        <Route path="/interface" element={<Interface />} />
       </Routes>
     </Router>
   );
