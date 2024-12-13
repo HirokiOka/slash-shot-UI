@@ -1,3 +1,9 @@
+@font-face {
+  font-family: 'Kaiso';
+  src: url('./fonts/Kaisotai-Next-UP-B.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
