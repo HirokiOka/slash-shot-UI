@@ -1,6 +1,9 @@
 // pages/Interface.tsx
 import '../assets/input.css';
 import { useState } from 'react';
+import blockSound from '../assets/block.mp3';
+import deleteSound from '../assets/delete.mp3';
+import submitSound from '../assets/send.mp3';
 
 type CodeBlock = {
   viewText: string;
@@ -116,6 +119,10 @@ function ConditionBlocks({ onButtonClick }): JSX.Element {
 
 
 function CodeEditor({ blockStack }): JSX.Element {
+  const submitClickSound = new Audio(submitSound);
+  function submitHandler() {
+    submitClickSound.play();
+  }
   const viewBlockStack: ViewBlock[] = blockStack
                                         .filter(v => v !== null);
   //console.log(viewBlockStack);
@@ -124,26 +131,31 @@ function CodeEditor({ blockStack }): JSX.Element {
     <div id="code-editor">
       <h1 className="pt-2 text-5xl font-bold text-center">あなたのプログラム</h1>
       <div id="border" className="border-4 border-yellow-700 h-5/6">
-        <div id="code-pane" className="pt-2 border h-4/6">
+        <div id="code-pane" className="pt-2 h-5/6">
           <ul className="px-2">
-          {viewBlockStack.map(({ viewText, bgColor, indentClass }, i) => (
-            <li key={i} className={`${indentClass} px-2 text-2xl ${bgColor}`}>{i+1}. {viewText}</li>
-          ))}
+            {viewBlockStack.map(({ viewText, bgColor, indentClass }, i) => (
+              <li key={i} className={`${indentClass} px-2 m-1 text-2xl ${bgColor}`}>{i+1}. {viewText}</li>
+            ))}
           </ul>
         </div>
 
-          <div id="sumbitButton" className="fixed bottom-24 left-3/4 transform -translate-x-1/4">
-            <button
-              className={submitButtonClass}>
-             かんせい
-            </button>
-          </div>
+        <div id="sumbitButton" className="fixed bottom-24 left-3/4 transform -translate-x-1/4">
+          <button
+            className={submitButtonClass}
+            onClick={submitHandler}>
+           かんせい
+          </button>
+        </div>
+
       </div>
     </div>
   );
 }
 
 function Home(): JSX.Element {
+  const blockClickSound = new Audio(blockSound);
+  const deleteClickSound = new Audio(deleteSound);
+
   const quitButtonClass = "m-1 py-2 px-4 text-white bg-black font-bold text-2xl rounded fixed";
   const timer = "m-2 py-1 px-4 text-white bg-black font-bold fixed left-1/2";
   const [blockStack, setBlockStack] = useState(Array(15).fill(null));
@@ -171,7 +183,6 @@ function Home(): JSX.Element {
     const nullBlockIndex = nextBlockStack.indexOf(null);
     const previousBlock: CodeBlock = nextBlockStack[nullBlockIndex - 1];
 
-    console.log(nextBlockStack);
     const currentInsertMode = getInsertMode();
     const currentIndentNum = getIndentNum();
 
@@ -187,6 +198,7 @@ function Home(): JSX.Element {
       return;
     }
 
+    blockClickSound.play();
     //Insert logic
     let insertBlock: ViewBlock;
     if (currentInsertMode === "CONDITIONAL") {
@@ -237,6 +249,7 @@ function Home(): JSX.Element {
     } else if (deleteType === "all") {
       setBlockStack(Array(15).fill(null));
     }
+    deleteClickSound.play();
   }
 
   return (
