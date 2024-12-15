@@ -5,20 +5,24 @@ import { useState } from 'react';
 type CodeBlock = {
   viewText: string;
   blockType: string;
+  bgColor: string;
 };
 
 type ViewBlock = {
   viewText: string;
+  blockType: string;
   bgColor: string;
+  indentClass: string;
 };
 
 function ActionBlocks({ onButtonClick }): JSX.Element {
+  const skyBlueBg = "bg-blue-400";
   const actionButtonClass = "m-2 py-3 px-4 bg-blue-400 font-bold text-2xl rounded";
   const actionBlockArray: CodeBlock[] = [
-    { "viewText": "こうげき", "blockType": "action" },
-    { "viewText": "ためる", "blockType": "action" },
-    { "viewText": "うえにうごく", "blockType": "action" },
-    { "viewText": "したにうごく", "blockType": "action" },
+    { "viewText": "こうげき", "blockType": "action", "bgColor": skyBlueBg },
+    { "viewText": "ためる", "blockType": "action", "bgColor": skyBlueBg },
+    { "viewText": "うえにうごく", "blockType": "action", "bgColor": skyBlueBg },
+    { "viewText": "したにうごく", "blockType": "action", "bgColor": skyBlueBg },
   ];
 
   return (
@@ -61,9 +65,10 @@ function DeleteBlocks({ onButtonClick }): JSX.Element {
 
 function IfBlocks({ onButtonClick }): JSX.Element {
   const ifButtonClass = "m-2 py-3 px-4 bg-purple-600 font-bold text-2xl rounded";
+  const purpleBg = "bg-purple-600";
   const ifBlockArray: CodeBlock[] = [
-    { "viewText": "もし◇なら", "blockType": "ifStart" },
-    { "viewText": "もしおわり", "blockType": "ifEnd" },
+    { "viewText": "もし◇なら", "blockType": "ifStart", "bgColor": purpleBg },
+    { "viewText": "もしおわり", "blockType": "ifEnd", "bgColor": purpleBg },
   ];
   return (
     <div id="if" className="pt-2 h-2/3">
@@ -83,10 +88,11 @@ function IfBlocks({ onButtonClick }): JSX.Element {
 }
 
 function ConditionBlocks({ onButtonClick }): JSX.Element {
+  const conditionBg = "bg-yellow-500";
   const condtionButtonClass = "mt-2 mx-4 py-3 px-4 bg-yellow-500 font-bold text-2xl rotate-45";
   const conditionBlockArray: CodeBlock[] = [
-    { "viewText": "おなじ<br />たかさ", "blockType": "condition" },
-    { "viewText": "ちがう<br />たかさ", "blockType": "condition" },
+    { "viewText": "おなじ<br />たかさ", "blockType": "condition", "bgColor": conditionBg },
+    { "viewText": "ちがう<br />たかさ", "blockType": "condition", "bgColor": conditionBg },
   ];
   return (
     <div id="condition" className="pt-2 h-2/3">
@@ -108,25 +114,10 @@ function ConditionBlocks({ onButtonClick }): JSX.Element {
   );
 }
 
-function getBlockColorMap(codeBlock: CodeBlock): ViewBlock {
-  let bgColor = "";
-  const viewText = codeBlock.viewText;
-  if (codeBlock.blockType === "action") {
-    bgColor = "bg-blue-400";
-  } else if (codeBlock.blockType ==="ifStart" || codeBlock.blockType ==="ifEnd" || codeBlock.blockType ==="ifCombined") {
-    bgColor = "bg-purple-600";
-  } else if (codeBlock.blockType === "condition") {
-    bgColor = "bg-yellow-500";
-  } else {
-    bgColor = "bg-black";
-  }
-  return { viewText, bgColor };
-}
 
 function CodeEditor({ blockStack }): JSX.Element {
   const viewBlockStack: ViewBlock[] = blockStack
-                                        .filter(v => v !== null)
-                                        .map(v => getBlockColorMap(v));
+                                        .filter(v => v !== null);
   //console.log(viewBlockStack);
   const submitButtonClass = "m-2 py-3 px-4 bg-green-700 font-bold text-2xl rounded";
   return (
@@ -134,9 +125,11 @@ function CodeEditor({ blockStack }): JSX.Element {
       <h1 className="pt-2 text-5xl font-bold text-center">あなたのプログラム</h1>
       <div id="border" className="border-4 border-yellow-700 h-5/6">
         <div id="code-pane" className="pt-2 border h-4/6">
-          {viewBlockStack.map(({ viewText, bgColor }, i) => (
-            <p key={i} className={`px-2 m-1 text-2xl ${bgColor}`}>{i+1}. {viewText}</p>
+          <ul className="px-2">
+          {viewBlockStack.map(({ viewText, bgColor, indentClass }, i) => (
+            <li key={i} className={`${indentClass} px-2 text-2xl ${bgColor}`}>{i+1}. {viewText}</li>
           ))}
+          </ul>
         </div>
 
           <div id="sumbitButton" className="fixed bottom-24 left-3/4 transform -translate-x-1/4">
@@ -178,9 +171,9 @@ function Home(): JSX.Element {
     const nullBlockIndex = nextBlockStack.indexOf(null);
     const previousBlock: CodeBlock = nextBlockStack[nullBlockIndex - 1];
 
+    console.log(nextBlockStack);
     const currentInsertMode = getInsertMode();
     const currentIndentNum = getIndentNum();
-    console.log("MODE: " + currentInsertMode);
 
     if (currentInsertMode === "NORMAL") {
       if (currentIndentNum < 1) {
@@ -195,17 +188,35 @@ function Home(): JSX.Element {
     }
 
     //Insert logic
-    let insertBlock: CodeBlock;
+    let insertBlock: ViewBlock;
     if (currentInsertMode === "CONDITIONAL") {
+      const indentClass = `ml-${currentIndentNum * 12}`;
+      const conditionViewText = selectedBlock.viewText.replace("<br />", "");
+      const mergedViewText = previousBlock.viewText.replace("◇", ` ${conditionViewText} `);
       insertBlock = {
-        "viewText": previousBlock.viewText + selectedBlock.viewText,
-        "blockType": "ifCombined"
+        "viewText": mergedViewText,
+        "blockType": "ifCombined",
+        "bgColor": previousBlock.bgColor,
+        "indentClass": indentClass,
       };
       nextBlockStack[nullBlockIndex-1] = insertBlock;
       setBlockStack(nextBlockStack);
       return;
+    } else if (currentInsertMode === "NORMAL" && selectedBlock.blockType === "ifEnd") {
+      const indentClass = `ml-${(currentIndentNum - 1) * 12}`;
+      insertBlock = {
+        ...selectedBlock,
+        "indentClass": indentClass,
+      };
+      nextBlockStack[nullBlockIndex] = insertBlock;
+      setBlockStack(nextBlockStack);
+      return;
     } else {
-      insertBlock = selectedBlock;
+      const indentClass = `ml-${currentIndentNum * 12}`;
+      insertBlock = {
+        ...selectedBlock,
+        "indentClass": indentClass,
+      };
       nextBlockStack[nullBlockIndex] = insertBlock;
       setBlockStack(nextBlockStack);
       return;
