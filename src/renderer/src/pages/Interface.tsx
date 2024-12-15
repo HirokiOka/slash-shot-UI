@@ -113,7 +113,7 @@ function getBlockColorMap(codeBlock: CodeBlock): ViewBlock {
   const viewText = codeBlock.viewText;
   if (codeBlock.blockType === "action") {
     bgColor = "bg-blue-400";
-  } else if (codeBlock.blockType ==="ifStart" || codeBlock.blockType ==="ifEnd") {
+  } else if (codeBlock.blockType ==="ifStart" || codeBlock.blockType ==="ifEnd" || codeBlock.blockType ==="ifCombined") {
     bgColor = "bg-purple-600";
   } else if (codeBlock.blockType === "condition") {
     bgColor = "bg-yellow-500";
@@ -127,7 +127,7 @@ function CodeEditor({ blockStack }): JSX.Element {
   const viewBlockStack: ViewBlock[] = blockStack
                                         .filter(v => v !== null)
                                         .map(v => getBlockColorMap(v));
-  console.log(viewBlockStack);
+  //console.log(viewBlockStack);
   const submitButtonClass = "m-2 py-3 px-4 bg-green-700 font-bold text-2xl rounded";
   return (
     <div id="code-editor">
@@ -155,25 +155,62 @@ function Home(): JSX.Element {
   const timer = "m-2 py-1 px-4 text-white bg-black font-bold fixed left-1/2";
   const [blockStack, setBlockStack] = useState(Array(15).fill(null));
 
-  function pushBlock(block: CodeBlock): void {
-    const lastBlock = blockStack[blockStack.length-1];
-    console.log(lastBlock);
+  function getIndentNum(): number {
+    const nextBlockStack = blockStack.slice();
+    const ifCombinedCount = nextBlockStack.filter(v => v != null).filter((v) => v.blockType === 'ifCombined').length;
+    const ifEndCount = nextBlockStack.filter(v => v != null).filter((v) => v.blockType === 'ifEnd').length;
+    const indentNum = Math.max(ifCombinedCount - ifEndCount, 0);
+    return indentNum;
+  }
+
+  function getInsertMode(): string {
+    const nextBlockStack = blockStack.slice();
+    const previousBlock: CodeBlock = nextBlockStack[nextBlockStack.indexOf(null) - 1];
+    if (previousBlock == undefined) return "NORMAL";
+    if (previousBlock.blockType === "action" || previousBlock.blockType === "ifEnd" || previousBlock.blockType === "ifCombined") return "NORMAL";
+    if (previousBlock.blockType === "ifStart") return "CONDITIONAL";
+    return "DEFAULT";
+  }
+
+  function pushBlock(selectedBlock: CodeBlock): void {
     if (blockStack.indexOf(null) === -1) return;
-    for (let i = 0; i < blockStack.length; i++) {
-      if (blockStack[i] === null){
-        const nextBlockStack = blockStack.slice();
-        nextBlockStack[i] = block;
-        setBlockStack(nextBlockStack);
-        return;
+    const nextBlockStack = blockStack.slice();
+    const nullBlockIndex = nextBlockStack.indexOf(null);
+    const previousBlock: CodeBlock = nextBlockStack[nullBlockIndex - 1];
+
+    const currentInsertMode = getInsertMode();
+    const currentIndentNum = getIndentNum();
+    console.log("MODE: " + currentInsertMode);
+
+    if (currentInsertMode === "NORMAL") {
+      if (currentIndentNum < 1) {
+        if (selectedBlock.blockType !== "action" && selectedBlock.blockType !== "ifStart") return;
+      } else {
+        if (selectedBlock.blockType !== "action" && selectedBlock.blockType !== "ifEnd" && selectedBlock.blockType !== "ifStart") return;
       }
+    } else if (currentInsertMode === "CONDITIONAL") {
+      if (selectedBlock.blockType !== "condition") return;
+    } else {
+      return;
+    }
+
+    //Insert logic
+    let insertBlock: CodeBlock;
+    if (currentInsertMode === "CONDITIONAL") {
+      insertBlock = {
+        "viewText": previousBlock.viewText + selectedBlock.viewText,
+        "blockType": "ifCombined"
+      };
+      nextBlockStack[nullBlockIndex-1] = insertBlock;
+      setBlockStack(nextBlockStack);
+      return;
+    } else {
+      insertBlock = selectedBlock;
+      nextBlockStack[nullBlockIndex] = insertBlock;
+      setBlockStack(nextBlockStack);
+      return;
     }
   }
-  /*
-   * Check insert mode (normal or conditional or in-ifBlock)
-   * Merge if-start + condition
-   */
-
-
 
   function popBlock(deleteType: string): void {
     const nextBlockStack = blockStack.slice();
